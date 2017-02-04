@@ -20,9 +20,11 @@ npm run build
 
 Uses gulp, webpack and PostSCC with some image and svg tools.
 
-* [gulp](https://gulpjs.com/) - Build system automating tasks
+* [gulp](http://gulpjs.com/) - Build system automating tasks
 * [webpack](https://webpack.github.io/) - Module bundler
-* [PostSCC](https://postcss.org/) - A tool for transforming CSS with JavaScript
+* [PostSCC](http://postcss.org/) - A tool for transforming CSS with JavaScript
+* [imagemin](https://github.com/imagemin/imagemin) - Minify images seamlessly
+* [svg-sprite](https://github.com/jkphl/svg-sprite) - SVG sprites & stacks galore
 
 ## Dependencies
 
