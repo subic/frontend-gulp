@@ -4,6 +4,8 @@ gulp            = require('gulp'),
 clean           = require('gulp-clean'),
 runSequence     = require('run-sequence'),
 browserSync     = require('browser-sync'),
+plumber         = require('gulp-plumber'),
+gulpif         = require('gulp-if'),
 reload          = browserSync.reload,
 
 //images build
@@ -30,201 +32,184 @@ cssnano        = require('cssnano'),
 
 htmlmin        = require('gulp-htmlmin'),
 
-// DIRECTORY STRUCTURE
-jsmain           = "js/*.js",
-cssmain          = "css/main.css",
-imagesdir        = "img",
-builddir         = "build",
-fontsdir         = "fonts",
-productiondir    = "production";
+config = {
 
+  folders: {
+    dev: 'build',
+    src: '.',
+    prod: 'production',
+  },
 
-gulp.task('styles', () => {
-  const processors = [
-    precss(),
-    cssnext({browsers: ['last 2 versions']}),
-    lost,
-    mqpacker,
-  ];
-  return gulp.src(cssmain)
-    .pipe(postcss(processors))
-    .pipe(rename('style.css'))
-    .pipe(gulp.dest(builddir))
+  assets: {
+    js: 'js/*.js',
+    css: {
+      base: 'css/main.css',
+      final: 'style.css',
+    },
+    imgs: 'img',
+    svg: '/**/*.svg',
+    copy: [
+        '*fonts/*.+(eot|woff|ttf|svg)',
+        'root/*.*',
+        'html/**/*.html',
+        'index.*'
+    ]
+  },
+
+  webpack: {
+    entry: {
+      main: "./js/main.js"
+    },
+    output: {
+      filename: "[name].js",
+      path: __dirname + "/build",
+    }
+  },
+
+  babel: {
+    presets: ['es2015']
+  },
+
+  postcss: {
+    dev: [
+      precss(),
+      cssnext({ browsers: ['last 2 versions']}),
+      lost,
+      mqpacker
+    ],
+    prod: [
+      autoprefixer({ browsers: ['last 2 versions']}),
+      cssnano
+    ]
+  },
+
+  svgsprite: {
+    shape: {
+      dimension: { maxWidth: 48, maxHeight: 48},
+      spacing: { padding: 4},
+      transform: ['svgo']
+    },
+    mode: {
+      symbol: {
+        dest: '.',
+        sprite: 'icons',
+        example: false
+      }
+    }
+  },
+
+  imagemin: {
+    optimizationLevel: 7,
+    progressive: true,
+    interlace: true,
+    multipass: true,
+  }
+
+};
+
+let production = false;
+
+gulp.task('set-production', () => {
+  production = true;
 });
 
-gulp.task('styles-production', () => {
-  const processors = [
-    autoprefixer({browsers: ['last 2 versions']}),
-    cssnano
-  ];
-  return gulp.src(builddir+'/style-cleaned.css')
-    .pipe(postcss(processors))
-    .pipe(rename('style.css'))
-    .pipe(gulp.dest(productiondir))
-});
+gulp.task('css', () => {
+  const src = production ? config.folders.dev+'/'+config.assets.css.final : config.folders.src+'/'+config.assets.css.base;
+  const dest = production ? config.folders.prod : config.folders.dev;
 
-gulp.task('purifycss', () => {
-  return gulp.src(builddir+'/style.css')
-    .pipe(rename('style-cleaned.css'))
-    .pipe(purify([builddir+'/**/*.js', builddir+'/**/*.html']))
-    .pipe(gulp.dest(builddir+'/'))
+  return gulp.src(src)
+    .pipe(plumber())
+    .pipe(gulpif(production, purify([config.folders.dev+'/**/*.js', config.folders.dev+'/**/*.html'])))
+    .pipe(gulpif(production, postcss(config.postcss.prod), postcss(config.postcss.dev)))
+    .pipe(rename(config.assets.css.final))
+    .pipe(gulp.dest(dest))
 });
 
 gulp.task('svg', () => {
-  return gulp.src(imagesdir+'/**/*.svg')
-    .pipe(svgSprite({
-    shape               : {
-        dimension       : {
-            maxWidth    : 48,
-            maxHeight   : 48
-       },
-       spacing         : {
-            padding     : 4
-       },
-         transform       : ['svgo']
-    },
-    mode                : {
-        symbol : {
-            dest: '.',
-            sprite: 'icons',
-            example: false
-        }
-    }
-}))
-    .pipe(gulp.dest(builddir+'/img'));
-});
+  const src = production ? `${config.folders.dev}/${config.assets.imgs}/${config.svgsprite.mode.symbol.sprite}.svg` : `${config.folders.src}/${config.assets.imgs}${config.assets.svg}`;
+  const dest = production ? config.folders.prod : config.folders.dev;
 
-gulp.task('svg-production', () => {
-  return gulp.src(builddir+'/img/icons.svg')
-    .pipe(gulp.dest(productiondir+'/img'));
+  return gulp.src(src)
+    .pipe(plumber())
+    .pipe(gulpif(!production, svgSprite(config.svgsprite)))
+    .pipe(gulp.dest(`${dest}/${config.assets.imgs}`));
 });
 
 gulp.task('images', () => {
-  return gulp.src(imagesdir+'/**/*.+(gif|jpg|png|woff)')
-    .pipe(gulp.dest(builddir+'/img'));
-});
+  const src = (production) ? config.folders.dev : config.folders.src;
+  const dest = (production) ? config.folders.prod : config.folders.dev;
 
-gulp.task('images-production', () => {
-  return gulp.src(builddir+'/'+imagesdir+'/**/*.+(gif|jpg|png|woff)')
-    .pipe(imagemin({
-      optimizationLevel: 7,
-      progressive: true,
-      interlace: true,
-      multipass: true,
-    }))
-    .pipe(gulp.dest(productiondir+'/img'));
+  return gulp.src(`${src}/${config.assets.imgs}/**/*.+(gif|jpg|png|woff)`)
+    .pipe(plumber())
+    .pipe(gulpif(production, imagemin(config.imagemin)))
+    .pipe(gulp.dest(`${dest}/${config.assets.imgs}`));
 });
 
 gulp.task('scripts', () => {
-  return gulp.src(jsmain)
-       .pipe(webpack({
-          entry: {
-            main: "./js/main.js"
-          },
-          output: {
-            filename: "[name].js",
-            path: __dirname + "/build",
-      }
-    }))
-    .pipe(sourcemaps.init())
-    .pipe(babel({
-      presets: ['es2015']
-    }))
-    .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest(builddir))
-    .pipe(reload({stream:true}));
-});
+  if (production) {
 
-gulp.task('scripts-production', () => {
-  return gulp.src(builddir+'/*.js')
-    .pipe(uglify({mangle:true}))
-    .pipe(gulp.dest(productiondir));
-});
+    return gulp.src(config.folders.dev+'/*.js')
+      .pipe(plumber())
+      .pipe(uglify({ mangle: true }))
+      .pipe(gulp.dest(config.folders.prod));
+  } else {
 
-gulp.task('clean', () => {
-    return gulp.src(builddir, {read: false})
-        .pipe(clean());
-});
-
-gulp.task('clean-production', () => {
-    return gulp.src(productiondir, {read: false})
-        .pipe(clean());
-});
-
-// File copy scripts
-gulp.task('fonts', () => {
-  return gulp.src(fontsdir+'/**/*.*')
-    .pipe(gulp.dest(builddir+'/fonts'));
-});
-
-gulp.task('fonts-production', () => {
-  return gulp.src(fontsdir+'/**/*.*')
-    .pipe(gulp.dest(productiondir+'/fonts'));
-});
-
-gulp.task('root', () => {
-  return gulp.src('root/**/*.*')
-    .pipe(gulp.dest(builddir));
-});
-
-gulp.task('root-production', () => {
-  return gulp.src(['root/**/*.*', '!**/*.html'])
-    .pipe(gulp.dest(productiondir));
+    return gulp.src(config.assets.js)
+      .pipe(plumber())
+      .pipe(webpack(config.webpack))
+      .pipe(sourcemaps.init())
+      .pipe(babel(config.babel))
+      .pipe(sourcemaps.write('.'))
+      .pipe(gulp.dest(config.folders.dev))
+      .pipe(reload({ stream: true }));
+  }
 });
 
 gulp.task('html', () => {
-  return gulp.src(['html/**/*.html'])
-    .pipe(gulp.dest(builddir));
-});
-
-gulp.task('html-production', () => {
-  return gulp.src(builddir+'/**/*.html')
+  return gulp.src(`${config.folders.dev}/**/*.html`)
+    .pipe(plumber())
     .pipe(htmlmin({collapseWhitespace: true}))
-    .pipe(gulp.dest(productiondir));
+    .pipe(gulp.dest(config.folders.prod));
 });
 
+gulp.task('clean', () => {
+  const folder = production ? config.folders.prod: config.folders.dev;
+
+  return gulp.src(folder, { read: false })
+    .pipe(clean());
+});
+
+gulp.task('copy', function () {
+  const dest = production ? config.folders.prod : config.folders.dev;
+
+  return gulp.src(config.assets.copy)
+    .pipe(plumber())
+    .pipe(gulp.dest(dest));
+});
 
 gulp.task('serve', () => {
+  const base = production ? config.folders.prod : config.folders.dev;
+
   browserSync.init({
-    server: {
-      baseDir: "./"+builddir+"/"
-    },
-    open: false,
+    server: { baseDir: `./${base}/` },
+    open: production,
     ghostMode: {
-        clicks: true,
-        forms: true,
-        scroll: false
-    }
-  });
-
-  gulp.watch('css/**/*.css', ['styles', reload]);
-  gulp.watch(['js/**/*.js'], ['scripts', reload]);
-  gulp.watch(['**/*.html'], ['html', reload]);
-  gulp.watch(['fonts/**/*.*'], ['fonts', reload]);
-  gulp.watch(['root/**/*.*'], ['root', reload]);
-  gulp.watch(['img/**/*.+(gif|jpg|png)'], ['images', reload]);
-  gulp.watch(['img/**/*.svg'], ['svg', reload]);
+      clicks: production,
+      forms: production,
+      scroll: false
+    }});
 });
 
-gulp.task('serve-production', () => {
-  browserSync.init({
-    server: {
-      baseDir: "./"+productiondir+"/"
-    },
-    open: true
-  });
+gulp.task('watch', () => {
+   gulp.watch('*css/**/*.css', ['css', reload]);
+   gulp.watch(['*js/**/*.js'], ['scripts', reload]);
+   gulp.watch(config.assets.copy, ['copy', reload]);
+   gulp.watch([config.assets.imgs+'/**/*.+(gif|jpg|png|woff)'], ['images', reload]);
+   gulp.watch([config.assets.imgs+'/**/*.svg'], ['svg', reload]);
 });
 
-gulp.task('build', (cb) => {
-    runSequence('clean', ['styles', 'html', 'svg', 'images', 'root', 'fonts', 'scripts'], cb);
-});
+gulp.task('build', (cb) => { runSequence('clean', ['css', 'svg', 'images', 'copy', 'scripts'], cb); });
 
-gulp.task('production', (cb) => {
-    runSequence('build', 'clean-production', 'purifycss',
-    ['styles-production', 'svg-production', 'images-production', 'root-production', 'fonts-production', 'scripts-production'],
-     'html-production', 'serve-production', cb);
-});
+gulp.task('production', (cb) => { runSequence('build', 'set-production', 'build', 'html', 'serve', cb); });
 
-gulp.task('default', (cb) => {
-    runSequence('build', 'serve', cb);
-});
+gulp.task('default', (cb) => {runSequence('build', 'serve', 'watch', cb); });
