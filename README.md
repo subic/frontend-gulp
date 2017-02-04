@@ -4,13 +4,13 @@ A gulp script for a simple webpage frontend build toolkit with some defaults whi
 
 ## Getting Started
 
-Clone or download the repository and install dependencies
+Clone or download the repository and install dependencies:
 
 ```
 npm install
 ```
 
-Customize the config variable in the [gulpfile](gulpfile.js) to your liking. An initial defaul folder structure can be setup by running
+Customize the config variable in the [gulpfile](gulpfile.js) to your liking. An initial default folder structure can be setup by running:
 
 ```
 npm run build
