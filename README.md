@@ -1,8 +1,36 @@
 # Frontend build tools
 
-A gulp package for a simple webpage front end build toolkit with some defaults which can be extended and customized.
+A gulp script for a simple webpage frontend build toolkit with some defaults which can be extended and customized.
 
-Uses gulp, webpack and postcss with some image and svg tools.
+## Getting Started
 
-This project is licensed under the terms of the MIT license.
+Clone or download the repository and install dependencies
+
+```
+npm install
+```
+
+Customize the config variable in the [gulpfile](gulpfile.js) to your liking. An initial defaul folder structure can be setup by running
+
+```
+npm run build
+```
+
+## Tools
+
+Uses gulp, webpack and PostSCC with some image and svg tools.
+
+* [gulp](https://gulpjs.com/) - Build system automating tasks
+* [webpack](https://webpack.github.io/) - Module bundler
+* [PostSCC](https://postcss.org/) - A tool for transforming CSS with JavaScript
+
+## Dependencies
+
+* [npm](https://www.npmjs.com/) - Package manager for JavaScript
+
+See [package.json](package.json) for the whole list.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
