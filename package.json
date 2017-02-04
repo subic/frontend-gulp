@@ -18,7 +18,7 @@
     "url": "https://github.com/subic/frontend-gulp/issues"
   },
   "homepage": "https://github.com/subic/frontend-gulp",
-  "dependencies": {
+  "devDependencies": {
     "autoprefixer": "^6.2.1",
     "babel-preset-es2015": "^6.3.13",
     "browser-sync": "^2.11.1",
@@ -40,6 +40,8 @@
     "cssnano": "^3.10.0",
     "gulp-htmlmin": "^3.0.0",
     "gulp-purifycss": "^0.2.0",
-    "gulp-svg-sprite": "^1.2.19"
+    "gulp-svg-sprite": "^1.2.19",
+    "gulp-if": "^2.0.2",
+    "gulp-plumber": "^1.1.0"
   }
 }
