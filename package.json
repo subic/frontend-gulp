@@ -1,6 +1,6 @@
 {
   "name": "frontend-build-tools",
-  "version": "0.6.0",
+  "version": "0.7.2",
   "description": "A gulp toolkit for a simple webpage front end build with some defaults which can be extended and customized.",
   "main": "gulpfile.js",
   "scripts": {
