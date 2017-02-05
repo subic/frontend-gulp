@@ -48,7 +48,7 @@ See [package.json](package.json) for the whole list.
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
-## Additional resources:
+## Additional resources
 
 Some useful links for further customizing your build process:
 
