@@ -17,7 +17,7 @@ const
   babel         = require('gulp-babel'),
   uglify        = require('gulp-uglify'),
 
-  // CSS Tools
+  // CSS tools
   postcss       = require('gulp-postcss'),
   precss        = require('precss'),
   autoprefixer  = require('autoprefixer'),
