@@ -67,7 +67,7 @@ Some useful links for further customizing your build process:
 * **[How to work with SVG icons](https://fvsch.com/code/svg-icons/how-to/)** An SVG icons primer by Florens Verschelde. Everything from export to implementation.
 * **[Creating an SVG icon workflow](https://lukewhitehouse.co.uk/blog/svg-icon-workflow/)** A tutorial by Luke Whitehouse that covers gulp and SVG icons integration with fallbacks for older broswers.
 * **[Creating SVG sprites using gulp and Sass](https://www.liquidlight.co.uk/blog/article/creating-svg-sprites-using-gulp-and-sass/)** SVG and Sass with gulp example by Mike Street.
-* **[A Gulp-Based External SVG Symbol Sprite Icon System](http://una.im/svg-icons/)** Some considerations for SVG icons implementation by Una Kravets,
+* **[A Gulp-Based External SVG Symbol Sprite Icon System](http://una.im/svg-icons/)** Some considerations for SVG icons implementation by Una Kravets.
 
 #### Static site
 
