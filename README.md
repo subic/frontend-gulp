@@ -4,6 +4,8 @@ Script for a simple frontend build with some defaults which can be extended and 
 
 ## Getting Started
 
+#### Project setup
+
 Clone or download the repository and install dependencies:
 
 ```
@@ -15,6 +17,8 @@ Customize the config variable in the [gulpfile](gulpfile.js) to your liking. An 
 ```
 npm run build
 ```
+
+#### Running gulp
 
 Default gulp task is optimized for production and includes browsersync with active file watching. Just run:
 
