@@ -194,8 +194,8 @@ gulp.task('serve', () => {
     server: { baseDir: `./${base}/` },
     open: production,
     ghostMode: {
-      clicks: production,
-      forms: production,
+      clicks: !production,
+      forms: !production,
       scroll: false
     }});
 });
