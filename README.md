@@ -18,8 +18,6 @@ npm run build
 
 ## Tools
 
-Uses gulp, webpack and PostSCC with some image and svg tools.
-
 * [gulp](http://gulpjs.com/) - Build system automating tasks
 * [webpack](https://webpack.github.io/) - Module bundler
 * [PostSCC](http://postcss.org/) - A tool for transforming CSS with JavaScript
