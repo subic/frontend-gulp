@@ -154,7 +154,6 @@ gulp.task('images', () => {
 
 gulp.task('scripts', () => {
   if (production) {
-
     return gulp.src(`${DEV}/*.js`)
       .pipe(plumber())
       .pipe(uglify({
@@ -162,7 +161,6 @@ gulp.task('scripts', () => {
       }))
       .pipe(gulp.dest(PROD));
   } else {
-
     return gulp.src(SCRIPTS)
       .pipe(plumber())
       .pipe(webpack(config.webpack))
@@ -187,6 +185,7 @@ gulp.task('html', () => {
 
 gulp.task('delete', () => {
   const folder = production ? PROD : DEV;
+
   return del([folder]);
 });
 
@@ -210,11 +209,12 @@ gulp.task('serve', () => {
       clicks: !production,
       forms: !production,
       scroll: false
-    }});
+    }
+  });
 });
 
 gulp.task('watch', () => {
-  gulp.watch('*css/**/*.css', ['css', reload]);
+  gulp.watch(['*css/**/*.css'], ['css', reload]);
   gulp.watch(['*js/**/*.js'], ['scripts', reload]);
   gulp.watch(FILES, ['copy', reload]);
   gulp.watch([IMAGES+'/**/*.+(gif|jpg|png|woff)'], ['images', reload]);
@@ -222,6 +222,6 @@ gulp.task('watch', () => {
 });
 
 // Gulp scripts
-gulp.task('build',      (cb) => { runSequence('delete', ['css', 'svg', 'images', 'copy', 'scripts'], cb); });
-gulp.task('production', (cb) => { runSequence('build', 'set-production', 'build', 'html', 'serve', cb); });
-gulp.task('default',    (cb) => { runSequence('build', 'serve', 'watch', cb); });
+gulp.task(  'build'       , (cb) => {runSequence('delete', ['css', 'svg', 'images', 'copy', 'scripts'], cb);});
+gulp.task(  'production'  , (cb) => {runSequence('build', 'set-production', 'build', 'html', 'serve', cb);});
+gulp.task(  'default'     , (cb) => {runSequence('build', 'serve', 'watch', cb);});
